@@ -13,12 +13,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import database.DatabaseHelper;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import common.DatabaseHelper;
+import common.di.DaggerServicesComponent;
+import common.di.ServicesComponent;
+import common.di.ServicesModule;
+import common.services.contracts.IArticleReadRepo;
+import common.services.contracts.IArticleReadService;
 
 public class MainActivity extends AppCompatActivity {
 
     private DatabaseHelper dbHelper;
     private Context ctx;
+    private IArticleReadService _readService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +39,20 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ctx = this;
 
+        ServicesComponent module = DaggerServicesComponent.builder()
+                .servicesModule(new ServicesModule(this))
+                .build();
+
+        _readService = module.provideArticleReadService();
+
+        _readService.getAllShirts();
+
         dbHelper = new DatabaseHelper(this);
-//        ContentValues vals = new ContentValues();
-//        vals.put("type", "SHIRT");
-//        vals.put("fileName", "shirt.png");
-//        dbHelper.getWritableDatabase().insert("wat", null, vals);
+        ContentValues vals = new ContentValues();
+        vals.put("type", "SHIRT");
+        vals.put("fileName", "shirt.png");
+        dbHelper.getWritableDatabase().insert("wat", null, vals);
+        dbHelper.close();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -41,10 +61,14 @@ public class MainActivity extends AppCompatActivity {
                 Cursor c = dbHelper.getReadableDatabase().query("wat", new String[]{"type", "filename"}, "1 == 1", null, null, null, null);
                 String s = ((Integer)c.getCount()).toString();
                 String[] names = c.getColumnNames();
+                List<String> types = new ArrayList<String>();
+                while(c.moveToNext()){
+                    types.add(c.getString(0));
+                }
+
                 StringBuilder sb = new StringBuilder();
-                for (String column : names) {
-                    sb.append(column);
-                    sb.append(" - ");
+                for (String type : types) {
+                    sb.append(type);
                 }
                 Toast.makeText(ctx, sb.toString(), Toast.LENGTH_LONG).show();
                 c.close();
