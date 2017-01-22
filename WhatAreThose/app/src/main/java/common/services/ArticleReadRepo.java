@@ -1,12 +1,14 @@
 package common.services;
 
-import android.content.ContentValues;
+import android.database.Cursor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import common.DatabaseHelper;
+import common.model.Article;
 import common.model.Shirt;
 import common.services.contracts.IArticleReadRepo;
 
@@ -21,11 +23,14 @@ public class ArticleReadRepo implements IArticleReadRepo {
 
     @Override
     public List<Shirt> getAllShirts() {
-        ContentValues vals = new ContentValues();
-        vals.put("type", "SHIdsfRT");
-        vals.put("fileName", "shirt.png");
-        _dbHelper.getWritableDatabase().insert("wat", null, vals);
-        _dbHelper.close();
-        return null;
+        List<Shirt> list = new ArrayList<>();
+        Cursor c = _dbHelper.query("SELECT id, name, type FROM Article");
+        if(c.moveToFirst()) {
+            do {
+                list.add(Shirt.createFromCursor(c));
+            } while(c.moveToNext());
+        }
+        c.close();
+        return list;
     }
 }

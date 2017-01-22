@@ -1,26 +1,25 @@
 package common.model;
 
-import java.util.UUID;
+import android.content.ContentValues;
 
-public abstract class Article {
+public abstract class Article implements DbWritable {
 
-    private UUID _id;
+    private long _id;
     private String _name;
     private ArticleType _type;
 
-    public Article(UUID _id, String _name, ArticleType _type) {
+    public Article(long _id, String _name, ArticleType _type) {
         this._id = _id;
         this._name = _name;
         this._type = _type;
     }
 
     public Article(String _name, ArticleType _type) {
-        this._id = UUID.randomUUID();
         this._name = _name;
         this._type = _type;
     }
 
-    public UUID getId() {
+    public long getId() {
         return _id;
     }
 
@@ -30,5 +29,13 @@ public abstract class Article {
 
     public ArticleType getType() {
         return _type;
+    }
+
+    @Override
+    public ContentValues toContentValues() {
+        ContentValues vals = new ContentValues();
+        vals.put("type", _type.toString());
+        vals.put("name", _name);
+        return vals;
     }
 }

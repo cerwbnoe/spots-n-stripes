@@ -1,28 +1,34 @@
 package com.dev.seanodon.whatarethose;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import common.DatabaseHelper;
 import common.di.DaggerServicesComponent;
 import common.di.ServicesComponent;
 import common.di.ServicesModule;
-import common.services.contracts.IArticleReadRepo;
+import common.model.Shirt;
 import common.services.contracts.IArticleReadService;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,10 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private Context ctx;
     private IArticleReadService _readService;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected void initControls() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ctx = this;
@@ -45,37 +48,37 @@ public class MainActivity extends AppCompatActivity {
 
         _readService = module.provideArticleReadService();
 
-        _readService.getAllShirts();
-
-        dbHelper = new DatabaseHelper(this);
-        ContentValues vals = new ContentValues();
-        vals.put("type", "SHIRT");
-        vals.put("fileName", "shirt.png");
-        dbHelper.getWritableDatabase().insert("wat", null, vals);
-        dbHelper.close();
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Cursor c = dbHelper.getReadableDatabase().query("wat", new String[]{"type", "filename"}, "1 == 1", null, null, null, null);
-                String s = ((Integer)c.getCount()).toString();
-                String[] names = c.getColumnNames();
-                List<String> types = new ArrayList<String>();
-                while(c.moveToNext()){
-                    types.add(c.getString(0));
-                }
-
+                List<Shirt> allShirts = _readService.getAllShirts();
                 StringBuilder sb = new StringBuilder();
-                for (String type : types) {
-                    sb.append(type);
+                for (Shirt shirt : allShirts) {
+                    sb.append(shirt.getName());
                 }
                 Toast.makeText(ctx, sb.toString(), Toast.LENGTH_LONG).show();
-                c.close();
-                Snackbar.make(view, s, Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
+//                Snackbar.make(view, s, Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
+
+        Button addButton = (Button)findViewById(R.id.addButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent addIntent = new Intent(ctx, AddArticleActivity.class);
+                startActivity(addIntent);
+            }
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        initControls();
     }
 
     @Override

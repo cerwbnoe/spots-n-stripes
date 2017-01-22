@@ -13,8 +13,28 @@
     tools:showIn="@layout/activity_main"
     tools:context="com.dev.seanodon.whatarethose.MainActivity">
 
-    <TextView
-        android:text="Hello World!"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/camera"
+        android:text="photo" />
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:id="@+id/delete"
+        android:layout_toRightOf="@+id/camera"
+        android:text="del" />
+
+    <Button
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:text="add"
+        android:id="@+id/addButton"
+        android:layout_toRightOf="@+id/delete" />
+
+    <ImageView
+        android:id="@+id/image_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="60dp"/>
 </RelativeLayout>
