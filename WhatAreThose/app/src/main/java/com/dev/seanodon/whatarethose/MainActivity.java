@@ -8,15 +8,22 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.dev.seanodon.whatarethose.adapters.ImagePagerAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(addIntent);
             }
         });
+
+        ViewPager viewPager = (ViewPager)findViewById(R.id.viewPager);
+
+        ImagePagerAdapter adapter = new ImagePagerAdapter(this);
+
+        viewPager.setAdapter(adapter);
+        viewPager.setCurrentItem(0);
     }
 
     @Override
